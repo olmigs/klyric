@@ -3,6 +3,7 @@
 	import Button from "./Button.svelte";
 	let input = "";
 	let promise; // = getVerbs(input);
+	let link = `<a href='https://github.com/olmigs/klyric#Ladder'><strong>word ladder</strong></a>`;
 	function handleVerb(put) {
 		promise = getVerbs(put);
 	}
@@ -20,13 +21,6 @@
 			document.getElementById("seed").selectionEnd = start - 1;
 		}
 	}
-	// function toggleModeButtonText() {
-	// 	if ($isDark) {
-	// 		isDark.set(false);
-	// 	} else {
-	// 		isDark.set(true);
-	// 	}
-	// }
 </script>
 
 <main>
@@ -66,9 +60,7 @@
 			{#if arr}
 				<div style="color: green" class="about">
 					<p>
-						Use the below adjectives/verbs to construct a <strong
-							><em>word ladder</em></strong
-						>.
+						Use the below adjectives/verbs to construct a {@html link}.
 					</p>
 				</div>
 				{#each arr as a}
