@@ -1,18 +1,19 @@
 <script>
     import { onMount } from 'svelte';
-    import { isDark } from './store';
+    import { isDark, selected, toggleDark } from './store';
     import { getAdjectives, getVerbs } from '../scripts/datamuseClient';
     import Button from './Button.svelte';
+    import SafeInput from './SafeInput.svelte';
     import { getRandomInt } from '../scripts/utils';
     import Adjs from './adjectives';
 
     let author = 'Miguel Guerrero';
     let title_adj = '';
-    let input = '';
-    let promise; // = getVerbs(input);
+    let promise;
     let link = `<a href='https://github.com/olmigs/klyric#Ladder'><strong>word ladder</strong></a>`;
     let words = ['lyricist', 'musician', 'programmer'];
     let desc = `A lyric exercise web app from ${words.join(', ')} ${author}.`;
+    let input_name = 'seed';
     let tab_cnt = 0;
 
     onMount(async () => {
@@ -20,33 +21,30 @@
             window.document.body.classList.toggle('dark-mode');
         }
         if (title_adj == '') {
-            title_adj = await getTitleFromAdjs();
+            title_adj = getTitleFromAdjs();
         }
     });
 
-    function handleVerb(put) {
-        promise = getVerbs(put);
-    }
-    function handleAdjective(put) {
-        promise = getAdjectives(put);
-    }
-    function removeSpecialChars() {
-        var str = document.getElementById('seed').value;
-        var start = document.getElementById('seed').selectionStart;
-        var checkStr = str.replace(/[\/\\?%*:|"<>]/g, '');
-        if (checkStr !== str) {
-            document.getElementById('seed').value = checkStr;
-            input = checkStr;
-            document.getElementById('seed').selectionStart = start - 1;
-            document.getElementById('seed').selectionEnd = start - 1;
-        }
-    }
+    const put = () => {
+        return document.getElementById(input_name).value;
+    };
+    const toggleMode = () => {
+        toggleDark($selected);
+        return window.document.body.classList.toggle('dark-mode');
+    };
+    const handleVerb = () => {
+        promise = getVerbs(put());
+    };
+    const handleAdjective = () => {
+        promise = getAdjectives(put());
+    };
+
     function incrementTab() {
         let curr = tab_cnt;
         tab_cnt++;
         return curr;
     }
-    async function getTitleFromAdjs() {
+    function getTitleFromAdjs() {
         const i = getRandomInt(Adjs.length);
         return capitalizeFirstLetter(Adjs[i]);
     }
@@ -71,42 +69,36 @@
                 aria-label="Star olmigs/klyric on GitHub">Star</a
             >
         </div>
-        <Button />
+        <Button
+            toggleHook={toggleMode}
+            condition={$isDark}
+            val="Light"
+            alt_val="Dark"
+        />
     </div>
     <div class="ctrl">
         <h1>
             {title_adj} Lyricist
         </h1>
-        <input
-            id="seed"
-            style="margin-top: 30px"
-            type="text"
-            bind:value={input}
-            on:input={removeSpecialChars}
-            autocomplete="off"
-            autocorrect="off"
-            autocapitalize="off"
-            spellcheck="true"
-            tab-index={incrementTab}
+        <SafeInput class="inputBox" name={input_name} index={incrementTab} />
+        <Button
+            val="Verb"
+            toggleHook={() => handleVerb()}
+            index={incrementTab}
         />
-        <button
-            class="fetch"
-            on:click={() => handleAdjective(input)}
-            tab-index={incrementTab}>Adjectives!</button
-        >
-        <button
-            class="fetch"
-            on:click={() => handleVerb(input)}
-            tab-index={incrementTab}>Verbs!</button
-        >
+        <Button
+            val="Adjective"
+            toggleHook={() => handleAdjective()}
+            index={incrementTab}
+        />
     </div>
     <div class="wordbox">
         {#await promise}
-            <div class="word">waiting...</div>
+            <div class="about"><p>waiting...</p></div>
         {:then arr}
             <!-- migstodo: pass arr to a component -->
             {#if arr}
-                <div style="color: green" class="about">
+                <div class="about">
                     <p>
                         Use the below adjectives/verbs to construct a {@html link}.
                     </p>
@@ -115,7 +107,7 @@
                     <div class="word"><p>{a.word}</p></div>
                 {/each}
             {:else}
-                <div style="color: green" class="word">
+                <div class="about">
                     <p>Type in a noun!</p>
                     <p style="font-size: 10pt">
                         Examples: physician, hunter, runner, etc.
@@ -149,15 +141,32 @@
         margin-top: 60px;
     }
 
+    .ctrl :global(.inputBox) {
+        margin-top: 25px;
+        margin-bottom: 25px;
+    }
+
     .about {
         flex: 0 0 100%;
+    }
+
+    .about p {
+        color: #27a227;
     }
 
     .word {
         margin: 5px;
         padding: 5px;
         flex-grow: 1;
+        border: 1px dotted transparent;
     }
+
+    /* .picked {
+        margin: 5px;
+        padding: 5px;
+        flex-grow: 1;
+        border: 1px dotted yellow;
+    } */
 
     .transient {
         display: flex;
@@ -166,27 +175,6 @@
         margin: 0 auto;
         margin-top: 40px;
         padding: 5px;
-    }
-
-    .fetch {
-        color: inherit;
-        background-color: inherit;
-        font-weight: bold;
-        border: 2px solid #cecbc1;
-        border-radius: 7px;
-        margin: 5px;
-        padding: 10px;
-        transition: border 0.3s;
-    }
-
-    .fetch:hover,
-    .fetch:focus {
-        border: 2px solid #e46739;
-    }
-
-    #seed {
-        background-image: linear-gradient(#d7f5fe, #adedff);
-        border-radius: 7px;
     }
 
     #github-link {

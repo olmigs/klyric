@@ -24,14 +24,14 @@ class Parameter {
     static Adjective = new Parameter('rel_jjb=');
     static Kinda = new Parameter('rel_spc=');
     static Noun = new Parameter('rel_jja=');
-    
+
     constructor(param) {
         this.code = param;
     }
 }
 
-export function getAdjectives(query) {
-    return fetch(Parameter.Adjective, query);
+export async function getAdjectives(query) {
+    return filterDigits(await fetch(Parameter.Adjective, query));
 }
 
 export async function getVerbs(query) {
@@ -39,12 +39,12 @@ export async function getVerbs(query) {
     let verbs = [];
     const init_trigs = await fetch(Parameter.Trigger, query);
     verbs = [...filterVerbs(init_trigs)];
-    
+
     // get 'relateds', i.e. synonyms and kindas
     const kindas = await fetch(Parameter.Kinda, query);
     const syns = await fetch(Parameter.Synonym, query);
     const relateds = [...syns, ...kindas];
-    
+
     // for each related, add trigger verbs to verbs
     for (let item of relateds) {
         const t = await fetch(Parameter.Trigger, item.word);
@@ -54,17 +54,17 @@ export async function getVerbs(query) {
     // get more verbs, if needed
     if (verbs.length < 10) {
         console.log('...standby....');
-        verbs = [...verbs, ...await getVerbsUnstable(query)];
+        verbs = [...verbs, ...(await getVerbsUnstable(query))];
     }
 
-    return verbs;
+    return filterDigits(verbs);
 }
 
 export function prettify(results) {
     for (let r of results) {
         console.log(`   ${r.word} (${r.tags.join(', ')})`);
     }
-} 
+}
 
 async function getVerbsUnstable(query) {
     const adjs = await fetch(Parameter.Adjective, query);
@@ -94,27 +94,30 @@ async function getVerbsUnstable(query) {
             break;
         }
     }
-    return verbs;
+    return filterDigits(verbs);
+}
+
+function filterDigits(arr) {
+    // source: https://stackoverflow.com/questions/41293681/removing-array-elements-that-contain-a-number
+    let hasNoDigits = (s) => /^\D*$/.test(s.word);
+    return arr.filter(hasNoDigits);
 }
 
 function filterVerbs(arr) {
     let ret = [];
-    arr
-        .filter(x => {
-            if (x.tags) {
-                return (
-                    x.tags.includes('v') ||
-                    (!x.tags.includes('n') &&
-                        !x.tags.includes('prop') &&
-                        !x.tags.includes('adj') &&
-                        !x.tags.includes('adv') &&
-                        !x.tags.includes('n/a'))
-                );
-            }
-        })
-        .forEach(element => {
-            ret.push(element);
+    arr.filter((x) => {
+        if (x.tags) {
+            return (
+                x.tags.includes('v') ||
+                (!x.tags.includes('n') &&
+                    !x.tags.includes('prop') &&
+                    !x.tags.includes('adj') &&
+                    !x.tags.includes('adv') &&
+                    !x.tags.includes('n/a'))
+            );
         }
-    );
+    }).forEach((element) => {
+        ret.push(element);
+    });
     return ret;
 }

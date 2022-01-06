@@ -1,5 +1,11 @@
 import { derived, writable } from 'svelte/store';
 
+export const input = writable('');
+
+export function updateInput(val) {
+    input.set(val);
+}
+
 // localStorage.setItem('klyric_selected', null);
 const storedSelection = localStorage.getItem('klyric_selected');
 export const selected = writable(storedSelection);
