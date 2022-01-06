@@ -4,6 +4,7 @@
     import { getAdjectives, getVerbs } from '../scripts/datamuseClient';
     import Button from './Button.svelte';
     import { getRandomInt } from '../scripts/utils';
+    import Adjs from './adjectives';
 
     let author = 'Miguel Guerrero';
     let title_adj = '';
@@ -19,7 +20,7 @@
             window.document.body.classList.toggle('dark-mode');
         }
         if (title_adj == '') {
-            title_adj = await getTitleAdjective();
+            title_adj = await getTitleFromAdjs();
         }
     });
 
@@ -45,11 +46,9 @@
         tab_cnt++;
         return curr;
     }
-    async function getTitleAdjective() {
-        let seed = words[getRandomInt(words.length)];
-        let adjs = await getAdjectives(seed);
-        const i = getRandomInt(adjs.length);
-        return capitalizeFirstLetter(adjs[i].word);
+    async function getTitleFromAdjs() {
+        const i = getRandomInt(Adjs.length);
+        return capitalizeFirstLetter(Adjs[i]);
     }
     function capitalizeFirstLetter(string) {
         return string.charAt(0).toUpperCase() + string.slice(1);
