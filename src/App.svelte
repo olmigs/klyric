@@ -1,26 +1,32 @@
 <script>
-    import { onMount } from 'svelte';
-    import { isDark, selected, toggleDark } from './store';
-    import { getAdjectives, getVerbs } from '../scripts/datamuseClient';
-    import Button from './Button.svelte';
-    import SafeInput from './SafeInput.svelte';
-    import { getRandomInt } from '../scripts/utils';
-    import Adjs from './adjectives';
+    import { onMount } from "svelte";
+    import { ladder, isDark, selected, toggleDark } from "./store";
+    import { getAdjectives, getVerbs } from "../scripts/datamuseClient";
+    import Word from "./Word.svelte";
+    import Button from "./Button.svelte";
+    import SafeInput from "./SafeInput.svelte";
+    import { getRandomInt } from "../scripts/utils";
+    import Adjs from "./adjectives";
 
-    let author = 'Miguel Guerrero';
-    let title_adj = '';
+    let author = "Miguel Guerrero";
+    let title_adj = "";
     let promise;
     let link = `<a href='https://github.com/olmigs/klyric#Ladder'><strong>word ladder</strong></a>`;
-    let words = ['lyricist', 'musician', 'programmer'];
-    let desc = `A lyric exercise web app from ${words.join(', ')} ${author}.`;
-    let input_name = 'seed';
+    let words = ["lyricist", "musician", "programmer"];
+    let desc = `A lyric exercise web app from ${words.join(", ")} ${author}.`;
+    let input_name = "seed";
     let tab_cnt = 0;
+    let lads;
+
+    ladder.subscribe((list) => {
+        lads = list;
+    });
 
     onMount(async () => {
         if ($isDark) {
-            window.document.body.classList.toggle('dark-mode');
+            window.document.body.classList.toggle("dark-mode");
         }
-        if (title_adj == '') {
+        if (title_adj == "") {
             title_adj = getTitleFromAdjs();
         }
     });
@@ -30,7 +36,7 @@
     };
     const toggleMode = () => {
         toggleDark($selected);
-        return window.document.body.classList.toggle('dark-mode');
+        return window.document.body.classList.toggle("dark-mode");
     };
     const handleVerb = () => {
         promise = getVerbs(put());
@@ -70,15 +76,16 @@
             >
         </div>
         <Button
-            toggleHook={toggleMode}
-            condition={$isDark}
             val="Light"
             alt_val="Dark"
+            toggleHook={toggleMode}
+            condition={$isDark}
         />
     </div>
     <div class="ctrl">
         <h1>
-            {title_adj} Lyricist
+            {title_adj}
+            {capitalizeFirstLetter(words[getRandomInt(words.length)])}
         </h1>
         <SafeInput class="inputBox" name={input_name} index={incrementTab} />
         <Button
@@ -92,11 +99,16 @@
             index={incrementTab}
         />
     </div>
+    {#if lads.length > 0}
+        <p>Ladder ({lads.length})</p>
+    {:else}
+        <p style="visibility: hidden;">Ladder</p>
+    {/if}
     <div class="wordbox">
         {#await promise}
             <div class="about"><p>waiting...</p></div>
         {:then arr}
-            <!-- migstodo: pass arr to a component -->
+            <!-- migstodo: pass arr to a component? -->
             {#if arr}
                 <div class="about">
                     <p>
@@ -104,7 +116,7 @@
                     </p>
                 </div>
                 {#each arr as a}
-                    <div class="word"><p>{a.word}</p></div>
+                    <Word value={a.word} />
                 {/each}
             {:else}
                 <div class="about">
@@ -152,13 +164,6 @@
 
     .about p {
         color: #27a227;
-    }
-
-    .word {
-        margin: 5px;
-        padding: 5px;
-        flex-grow: 1;
-        border: 1px dotted transparent;
     }
 
     /* .picked {

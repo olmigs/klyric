@@ -1,7 +1,6 @@
 <!-- source: https://svelte.dev/repl/ed4fef4beceb4b0eb295d1f9fdf3bd62?version=3.6.9 -->
 <script>
     import { onMount, afterUpdate } from 'svelte';
-
     export let toggleHook = () => {};
     export let condition = 'UNSET';
     export let val = '';
@@ -31,7 +30,7 @@
     }
 </script>
 
-<button tabindex={index} on:click={() => toggle()}>
+<button tabindex={index} on:click={toggle}>
     {text}
 </button>
 
