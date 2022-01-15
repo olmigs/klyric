@@ -1,10 +1,8 @@
 <script>
     import { ladder } from './store';
-    export let value;
-    let checked = false;
+    export let value, checked;
 
     function check() {
-        console.log("help");
         // migsnote: optionally add ` context="module" ` to script tag to export this function
         if (checked) {
             ladder.update((list) => list.filter((x) => x !== value));
@@ -16,7 +14,7 @@
     }
 </script>
 
-<div class:selected="{checked}" on:click={check}><p>{value}</p></div>
+<div class:selected={checked} on:click={check}><p>{value}</p></div>
 
 <style>
     div {
@@ -26,9 +24,11 @@
         flex-grow: 1;
         border: 2px solid transparent;
     }
-
     div.selected {
-        color: #a03f3f;
+        color: #e46739;
         font-weight: bold;
+    }
+    :global(body.dark-mode) div.selected {
+        color: #0084f6;
     }
 </style>

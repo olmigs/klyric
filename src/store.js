@@ -1,6 +1,12 @@
-import { derived, writable } from 'svelte/store';
+import { get, derived, writable } from 'svelte/store';
 
 export const ladder = writable([]);
+
+// export function ladderIncludes(word) {
+//    let laddy = get(ladder);
+//    console.log(laddy);
+//    return laddy.includes(word);
+// }
 
 // localStorage.setItem('klyric_selected', null);
 const storedSelection = localStorage.getItem('klyric_selected');

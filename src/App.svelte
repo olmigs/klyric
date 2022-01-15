@@ -1,20 +1,21 @@
 <script>
-    import { onMount } from "svelte";
-    import { ladder, isDark, selected, toggleDark } from "./store";
-    import { getAdjectives, getVerbs } from "../scripts/datamuseClient";
-    import Word from "./Word.svelte";
-    import Button from "./Button.svelte";
-    import SafeInput from "./SafeInput.svelte";
-    import { getRandomInt } from "../scripts/utils";
-    import Adjs from "./adjectives";
+    import { onMount } from 'svelte';
+    import { ladder, isDark, selected, toggleDark } from './store';
+    import { getAdjectives, getVerbs } from '../scripts/datamuseClient';
+    import Ladder from './Ladder.svelte';
+    import Word from './Word.svelte';
+    import Button from './Button.svelte';
+    import SafeInput from './SafeInput.svelte';
+    import { getRandomInt } from '../scripts/utils';
+    import Adjs from './adjectives';
 
-    let author = "Miguel Guerrero";
-    let title_adj = "";
+    let author = 'Miguel Guerrero';
+    let title_adj = '';
     let promise;
-    let link = `<a href='https://github.com/olmigs/klyric#Ladder'><strong>word ladder</strong></a>`;
-    let words = ["lyricist", "musician", "programmer"];
-    let desc = `A lyric exercise web app from ${words.join(", ")} ${author}.`;
-    let input_name = "seed";
+    let link = `<a style="color:inherit;" href='https://github.com/olmigs/klyric#Ladder'><strong>word ladder</strong></a>`;
+    let words = ['lyricist', 'musician', 'programmer'];
+    let desc = `A lyric exercise web app from ${words.join(', ')} ${author}.`;
+    let input_name = 'seed';
     let tab_cnt = 0;
     let lads;
 
@@ -24,9 +25,9 @@
 
     onMount(async () => {
         if ($isDark) {
-            window.document.body.classList.toggle("dark-mode");
+            window.document.body.classList.toggle('dark-mode');
         }
-        if (title_adj == "") {
+        if (title_adj == '') {
             title_adj = getTitleFromAdjs();
         }
     });
@@ -36,7 +37,7 @@
     };
     const toggleMode = () => {
         toggleDark($selected);
-        return window.document.body.classList.toggle("dark-mode");
+        return window.document.body.classList.toggle('dark-mode');
     };
     const handleVerb = () => {
         promise = getVerbs(put());
@@ -100,9 +101,9 @@
         />
     </div>
     {#if lads.length > 0}
-        <p>Ladder ({lads.length})</p>
+        <Ladder words={lads} />
     {:else}
-        <p style="visibility: hidden;">Ladder</p>
+        <p style="visibility: hidden;">Ladder (0)</p>
     {/if}
     <div class="wordbox">
         {#await promise}
@@ -116,7 +117,7 @@
                     </p>
                 </div>
                 {#each arr as a}
-                    <Word value={a.word} />
+                    <Word value={a.word} checked={lads.includes(a.word)} />
                 {/each}
             {:else}
                 <div class="about">
@@ -139,7 +140,6 @@
         max-width: 240px;
         margin: 0 auto;
     }
-
     .wordbox {
         margin-top: 20px;
         margin-left: auto;
@@ -148,31 +148,19 @@
         display: flex;
         flex-flow: row wrap;
     }
-
     .ctrl {
         margin-top: 60px;
     }
-
     .ctrl :global(.inputBox) {
         margin-top: 25px;
         margin-bottom: 25px;
     }
-
     .about {
         flex: 0 0 100%;
     }
-
     .about p {
-        color: #27a227;
+        color: #43ad7d;
     }
-
-    /* .picked {
-        margin: 5px;
-        padding: 5px;
-        flex-grow: 1;
-        border: 1px dotted yellow;
-    } */
-
     .transient {
         display: flex;
         justify-content: space-between;
@@ -181,12 +169,10 @@
         margin-top: 40px;
         padding: 5px;
     }
-
     #github-link {
         text-decoration: none;
         color: black;
     }
-
     :global(body) {
         background-color: #f2eee2;
         color: #0084f6;
@@ -196,7 +182,6 @@
         background-color: #1d3040;
         color: #bfc2c7;
     }
-
     @media (min-width: 640px) {
         main {
             max-width: none;
