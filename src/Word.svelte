@@ -23,6 +23,7 @@
         padding: 5px;
         flex-grow: 1;
         border: 2px solid transparent;
+        border-radius: 7px;
     }
     div.selected {
         color: #e46739;
