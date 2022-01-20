@@ -103,7 +103,7 @@
     {#if lads.length > 0}
         <Ladder words={lads} />
     {:else}
-        <p style="visibility: hidden;">Ladder (0)</p>
+        <p style="margin: 40px; visibility: hidden;">Ladder (0)</p>
     {/if}
     <div class="wordbox">
         {#await promise}

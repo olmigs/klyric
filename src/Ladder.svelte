@@ -1,20 +1,41 @@
-<!-- Goals:
-    1. needs a boolean isVisible property to show only "Ladder ({$ladder.length})" when isVisible === false
-    2. when visible, must be able to remove randomized words from Ladder on:click
-    3. possibly, do not allow duplicates (i.e. use Set type)
-    4. remember: Elements with a contenteditable="true" attribute support textContent and innerHTML bindings
--->
 <script>
-    import { ladder } from './store';
+    import { afterUpdate } from 'svelte';
+    import { ladder, mySpecialWords, updateSpecialWords } from './store';
     export let words = [];
+    let specials = [];
     let isVisible = false;
+
+    mySpecialWords.subscribe((list) => {
+        specials = list;
+    });
+    afterUpdate(async () => {
+        let firstTd = document.getElementById('special-0');
+        if (firstTd) {
+            let taintedInner = firstTd.innerHTML;
+            let scrubbedInner = taintedInner.replace(/\<(.*)\>/g, '');
+            document.getElementById('special-0').innerHTML = scrubbedInner;
+        }
+    });
 
     function toggleVis() {
         if (isVisible) {
+            save();
             isVisible = false;
         } else {
             isVisible = true;
         }
+    }
+    function save() {
+        let table = document.getElementById('laddy');
+        const rowLen = table.rows.length;
+        const words = [];
+        for (let i = 0; i < rowLen; i++) {
+            let cells = table.rows.item(i).cells;
+            let word = cells[1].innerHTML;
+            let scrubbedWord = word.replace(/\<(.*)\>/g, '');
+            words.push(scrubbedWord);
+        }
+        updateSpecialWords(words);
     }
     function remove(value) {
         ladder.update((list) => list.filter((x) => x !== value));
@@ -23,11 +44,15 @@
 
 {#if isVisible}
     <p class="title" on:click={toggleVis}>Ladder ({words.length}) ▲</p>
-    <table>
-        {#each words as word}
+    <table id="laddy">
+        {#each words as word, i}
             <tr>
                 <td><p on:click={() => remove(word)}>{word}</p></td>
-                <td contenteditable="true" />
+                <td id={'special-' + i} contenteditable="true">
+                    {#if specials.length > 0 && specials[i]}
+                        {specials[i]}
+                    {/if}
+                </td>
             </tr>
         {/each}
     </table>
