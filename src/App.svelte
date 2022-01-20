@@ -9,12 +9,16 @@
     import { getRandomInt } from '../scripts/utils';
     import Adjs from './adjectives';
 
+    // headers/meta content
     let author = 'Miguel Guerrero';
+    let words = ['lyricist', 'musician', 'programmer'];
+    let desc = `A lyric exercise web app from ${words.join(', ')} ${author}.`;
+    // let imageURL =
+    //     'https://s3.us-west-2.amazonaws.com/mdguerrero.com/ladder_example1.png';
+
     let title_adj = '';
     let promise;
     let link = `<a style="color:inherit;" href='https://github.com/olmigs/klyric#Ladder'><strong>word ladder</strong></a>`;
-    let words = ['lyricist', 'musician', 'programmer'];
-    let desc = `A lyric exercise web app from ${words.join(', ')} ${author}.`;
     let input_name = 'seed';
     let tab_cnt = 0;
     let lads;
@@ -63,7 +67,7 @@
 <svelte:head>
     <meta name="description" content={desc} />
     <meta name="author" content={author} />
-    <meta property="og:image" content="/ladder_example1.png" />
+    <!-- <meta property="og:image" content={imageURL} /> -->
 </svelte:head>
 
 <main>
