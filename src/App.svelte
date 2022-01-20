@@ -63,6 +63,7 @@
 <svelte:head>
     <meta name="description" content={desc} />
     <meta name="author" content={author} />
+    <meta property="og:image" content="/ladder_example1.png" />
 </svelte:head>
 
 <main>
